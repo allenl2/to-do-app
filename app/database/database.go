@@ -35,10 +35,26 @@ func AutoMigrateDB() error {
 	return autoMigErr
 }
 
-func FindUser(user *models.User, username string) *gorm.DB {
+func RetrieveUser(user *models.User, username string) *gorm.DB {
 	return DB.Where(&models.User{Username: username}).First(user)
 }
 
 func CreateNewUser(user *models.User) *gorm.DB {
 	return DB.Create(user)
+}
+
+func RetrieveAllTasks(tasks *[]models.Task) *gorm.DB {
+	return DB.Find(tasks)
+}
+
+func RetrieveTask(task *models.Task, id uint) *gorm.DB {
+	return DB.Where(&models.Task{ID: id}).Find(task)
+}
+
+func CreateNewTask(task *models.Task) *gorm.DB {
+	return DB.Create(task)
+}
+
+func DeleteTask(task *models.Task) *gorm.DB {
+	return DB.Delete(task)
 }

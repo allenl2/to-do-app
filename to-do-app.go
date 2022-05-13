@@ -26,6 +26,12 @@ func main() {
 	app.Get("/user/:username", controllers.GetUser)
 	app.Post("/user/:username", controllers.CreateUser)
 
+	//Tasks
+	app.Get("/tasks", controllers.GetAllTasks)
+	app.Get("/tasks/:id", controllers.GetTask)
+	app.Post("/tasks", controllers.CreateTask)
+	app.Delete("/tasks/:id", controllers.DeleteTask)
+
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.SendString("Hi World! Welcome!")
 	})

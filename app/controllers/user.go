@@ -32,7 +32,7 @@ func GetUser(c *fiber.Ctx) error {
 	var user models.User
 
 	//search for the user with the given username
-	result := database.FindUser(&user, c.Params("username"))
+	result := database.RetrieveUser(&user, c.Params("username"))
 
 	if result.Error != nil {
 		log.Println("User not found.", result)
