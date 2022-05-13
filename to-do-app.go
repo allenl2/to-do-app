@@ -1,6 +1,9 @@
 package main
 
 import (
+	"log"
+	"to-do-app/app/database"
+
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -12,4 +15,11 @@ func main() {
 	})
 
 	app.Listen(":3000")
+
+	database.Init()
+	autoMigErr := database.AutoMigrateDB()
+
+	if autoMigErr != nil {
+		log.Println("Error occurred while auto migrating database")
+	}
 }
