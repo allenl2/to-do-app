@@ -8,12 +8,12 @@ import (
 	"gorm.io/gorm"
 )
 
-var db *gorm.DB
+var DB *gorm.DB
 var err error
 
 func Init() *gorm.DB {
 	dbURL := "host=localhost user=todo password=secret dbname=todo port=5432"
-	db, err = gorm.Open(postgres.Open(dbURL), &gorm.Config{})
+	DB, err = gorm.Open(postgres.Open(dbURL), &gorm.Config{})
 
 	if err != nil {
 		log.Println(err)
@@ -21,7 +21,7 @@ func Init() *gorm.DB {
 		log.Println("Connected to database!")
 	}
 
-	return db
+	return DB
 }
 
 //auto migrates the models into the database
@@ -31,6 +31,30 @@ func AutoMigrateDB() error {
 		return err
 	}
 
-	autoMigErr := db.AutoMigrate(&models.Task{}, &models.User{})
+	autoMigErr := DB.AutoMigrate(&models.Task{}, &models.User{})
 	return autoMigErr
+}
+
+func RetrieveUser(user *models.User, username string) *gorm.DB {
+	return DB.Where(&models.User{Username: username}).First(user)
+}
+
+func CreateNewUser(user *models.User) *gorm.DB {
+	return DB.Create(user)
+}
+
+func RetrieveAllTasks(tasks *[]models.Task) *gorm.DB {
+	return DB.Find(tasks)
+}
+
+func RetrieveTask(task *models.Task, id uint) *gorm.DB {
+	return DB.Where(&models.Task{ID: id}).Find(task)
+}
+
+func CreateNewTask(task *models.Task) *gorm.DB {
+	return DB.Create(task)
+}
+
+func DeleteTask(task *models.Task) *gorm.DB {
+	return DB.Delete(task)
 }
