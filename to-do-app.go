@@ -37,4 +37,11 @@ func main() {
 	})
 
 	app.Listen(":3000")
+
+	database.Init()
+	autoMigErr := database.AutoMigrateDB()
+
+	if autoMigErr != nil {
+		log.Println("Error occurred while auto migrating database")
+	}
 }
