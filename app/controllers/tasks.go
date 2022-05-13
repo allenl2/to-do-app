@@ -18,8 +18,8 @@ func GetAllTasks(c *fiber.Ctx) error {
 	result := database.RetrieveAllTasks(&tasks)
 
 	if result.Error != nil {
-		log.Println("Unable to retrieve tasks", result)
-		return result.Error
+		log.Println("Unable to retrieve tasks.", result.Error.Error())
+		return fiber.NewError(fiber.StatusInternalServerError, result.Error.Error())
 	}
 	return c.JSON(tasks)
 }
@@ -30,7 +30,7 @@ func GetTask(c *fiber.Ctx) error {
 	id, err := strconv.ParseUint(c.Params("id"), 10, 32)
 
 	if err != nil {
-		log.Println("Invalid task", err)
+		log.Println("Invalid task.", err)
 		return err
 	}
 
@@ -38,8 +38,8 @@ func GetTask(c *fiber.Ctx) error {
 	result := database.RetrieveTask(&task, uint(id))
 
 	if result.Error != nil {
-		log.Println("Unable to retrieve task", result)
-		return result.Error
+		log.Println("Unable to find task.", result.Error.Error())
+		return fiber.NewError(fiber.StatusNotFound, result.Error.Error())
 	}
 	return c.JSON(task)
 }
@@ -57,9 +57,10 @@ func CreateTask(c *fiber.Ctx) error {
 	result := database.CreateNewTask(task)
 
 	if result.Error != nil {
-		log.Println("Unable to create new task in database", result)
-		return result.Error
+		log.Println("Unable to create new task in database.", result.Error.Error())
+		return fiber.NewError(fiber.StatusInternalServerError, result.Error.Error())
 	}
+	c.Status(fiber.StatusCreated)
 	return c.JSON(task)
 }
 
@@ -76,8 +77,8 @@ func DeleteTask(c *fiber.Ctx) error {
 	result := database.DeleteTask(task)
 
 	if result.Error != nil {
-		log.Println("Unable to delete task", result)
-		return result.Error
+		log.Println("Unable to delete task.", result.Error.Error())
+		return fiber.NewError(fiber.StatusInternalServerError, result.Error.Error())
 	}
 	return c.JSON(task)
 }

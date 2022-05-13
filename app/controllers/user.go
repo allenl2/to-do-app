@@ -8,25 +8,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-// func CreateUser(c *fiber.Ctx) error {
-// 	user := models.User{Username: "John Smith", Password: "password1"}
-// 	var db *gorm.DB
-// 	result := db.Create(&user)
-
-// 	if result != nil {
-// 		log.Println("Failed to create new user.")
-// 		return nil
-// 	}
-
-// 	log.Println("Created new user.")
-// 	return nil
-// }
-
-// func GetUsers(c *fiber.Ctx) error {
-// 	var user models.User
-
-// }
-
 //searches for the user based on username
 func GetUser(c *fiber.Ctx) error {
 	var user models.User
@@ -35,8 +16,8 @@ func GetUser(c *fiber.Ctx) error {
 	result := database.RetrieveUser(&user, c.Params("username"))
 
 	if result.Error != nil {
-		log.Println("User not found.", result)
-		return result.Error
+		log.Println("User not found.", result.Error.Error())
+		return fiber.NewError(fiber.StatusNotFound, result.Error.Error())
 	}
 	return c.JSON(models.User{
 		Username: user.Username,
@@ -52,9 +33,10 @@ func CreateUser(c *fiber.Ctx) error {
 	result := database.CreateNewUser(&user)
 
 	if result.Error != nil {
-		log.Println("Unable to add user.", result)
-		return result.Error
+		log.Println("Unable to add user.", result.Error.Error())
+		return fiber.NewError(fiber.StatusInternalServerError, result.Error.Error())
 	}
+	c.Status(fiber.StatusCreated)
 	return c.JSON(models.User{
 		Username: user.Username,
 		Password: user.Password,
