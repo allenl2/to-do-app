@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	//Setup the server using Go FIber
+	//Setup the server using Go Fiber
 	app := fiber.New()
 
 	//Initialize the database
@@ -20,10 +20,11 @@ func main() {
 		log.Println("Error occurred while auto migrating database")
 	}
 
-	//Routes
-	//Gets
-	//app.Get("/user/all", controllers.GetUsers)
-	app.Get("/user", controllers.GetUser)
+	//ROUTES
+
+	//Users (Temporary) - will replace with Auth service
+	app.Get("/user/:username", controllers.GetUser)
+	app.Post("/user/:username", controllers.CreateUser)
 
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.SendString("Hi World! Welcome!")

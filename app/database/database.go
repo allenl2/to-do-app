@@ -36,7 +36,9 @@ func AutoMigrateDB() error {
 }
 
 func FindUser(user *models.User, username string) *gorm.DB {
-	log.Println(DB.First(user).Error)
-	//return DB.First(user)
-	return DB.Where(&models.User{Username: "John"}).First(user)
+	return DB.Where(&models.User{Username: username}).First(user)
+}
+
+func CreateNewUser(user *models.User) *gorm.DB {
+	return DB.Create(user)
 }
