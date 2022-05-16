@@ -20,6 +20,9 @@ func main() {
 		log.Println("Error occurred while auto migrating database")
 	}
 
+	//Initialize redis cache
+	database.InitRedis()
+
 	//ROUTES
 
 	//Users (Temporary) - will replace with Auth service
@@ -37,11 +40,4 @@ func main() {
 	})
 
 	app.Listen(":3000")
-
-	database.Init()
-	autoMigErr := database.AutoMigrateDB()
-
-	if autoMigErr != nil {
-		log.Println("Error occurred while auto migrating database")
-	}
 }
