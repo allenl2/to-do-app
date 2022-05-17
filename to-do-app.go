@@ -37,7 +37,7 @@ func main() {
 
 	//Users (Temporary) - will replace with Auth service
 	app.Get("/user/:username", controllers.GetUser)
-	app.Post("/user/:username", controllers.CreateUser)
+	app.Post("/user", controllers.CreateUser)
 
 	//Tasks
 	app.Get("/tasks", controllers.GetAllTasks)
