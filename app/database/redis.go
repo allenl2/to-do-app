@@ -8,7 +8,7 @@ import (
 )
 
 var Rdb *redis.Storage
-var store *session.Store
+var SessionStore *session.Store
 
 func InitRedis() {
 	Rdb = redis.New(redis.Config{
@@ -16,10 +16,12 @@ func InitRedis() {
 	})
 
 	log.Println("Redis cache connected!")
+}
 
-	store = session.New(session.Config{
+func CreateSession() *session.Store {
+	SessionStore = session.New(session.Config{
 		Storage: Rdb,
 	})
-
 	log.Println("Session started!")
+	return SessionStore
 }

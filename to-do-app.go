@@ -6,7 +6,6 @@ import (
 	"to-do-app/app/database"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/basicauth"
 )
 
 func main() {
@@ -25,17 +24,19 @@ func main() {
 	database.InitRedis()
 
 	//Authenication middelware
-	app.Use("/tasks", basicauth.New(basicauth.Config{
-		Users: map[string]string{
-			"admin": "123456",
-		},
-		Realm:      "Forbidden",
-		Authorizer: controllers.LoginAuth,
-	}))
+	// app.Use("/tasks", basicauth.New(basicauth.Config{
+	// 	Users: map[string]string{
+	// 		"admin": "123456",
+	// 	},
+	// 	Realm:      "Forbidden",
+	// 	Authorizer: controllers.LoginAuth,
+	// }))
 
 	//ROUTES
+	//Authentication
+	app.Post("/api/login", controllers.LoginAuth)
 
-	//Users (Temporary) - will replace with Auth service
+	//Users
 	app.Get("/user/:username", controllers.GetUser)
 	app.Post("/user", controllers.CreateUser)
 
