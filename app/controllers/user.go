@@ -5,6 +5,7 @@ import (
 	"to-do-app/app/database"
 	"to-do-app/app/models"
 
+	"github.com/alexedwards/argon2id"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -27,15 +28,32 @@ func GetUser(c *fiber.Ctx) error {
 
 //creates a new user with the provided username, default password
 func CreateUser(c *fiber.Ctx) error {
-	user := models.User{Username: c.Params("username"), Password: "password"}
 
-	//search for the user with the given username
+	var user models.User
+	parseErr := c.BodyParser(&user)
+
+	if parseErr != nil {
+		log.Println("Unable to create new user.", parseErr)
+		return fiber.NewError(fiber.StatusBadRequest, parseErr.Error())
+	}
+
+	hash, hashErr := argon2id.CreateHash(user.Password, argon2id.DefaultParams)
+
+	if hashErr != nil {
+		log.Println("Unable to create new user.", hashErr)
+		return fiber.NewError(fiber.StatusInternalServerError, hashErr.Error())
+	}
+
+	user.Password = hash
+
+	//add the user to the database
 	result := database.CreateNewUser(&user)
 
 	if result.Error != nil {
 		log.Println("Unable to add user.", result.Error.Error())
 		return fiber.NewError(fiber.StatusInternalServerError, result.Error.Error())
 	}
+
 	c.Status(fiber.StatusCreated)
 	return c.JSON(models.User{
 		Username: user.Username,

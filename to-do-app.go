@@ -6,6 +6,7 @@ import (
 	"to-do-app/app/database"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/basicauth"
 )
 
 func main() {
@@ -20,11 +21,23 @@ func main() {
 		log.Println("Error occurred while auto migrating database")
 	}
 
+	//Initialize redis cache and session
+	database.InitRedis()
+
+	//Authenication middelware
+	app.Use("/tasks", basicauth.New(basicauth.Config{
+		Users: map[string]string{
+			"admin": "123456",
+		},
+		Realm:      "Forbidden",
+		Authorizer: controllers.LoginAuth,
+	}))
+
 	//ROUTES
 
 	//Users (Temporary) - will replace with Auth service
 	app.Get("/user/:username", controllers.GetUser)
-	app.Post("/user/:username", controllers.CreateUser)
+	app.Post("/user", controllers.CreateUser)
 
 	//Tasks
 	app.Get("/tasks", controllers.GetAllTasks)
@@ -37,11 +50,4 @@ func main() {
 	})
 
 	app.Listen(":3000")
-
-	database.Init()
-	autoMigErr := database.AutoMigrateDB()
-
-	if autoMigErr != nil {
-		log.Println("Error occurred while auto migrating database")
-	}
 }
