@@ -66,17 +66,51 @@ func LoginAuth(c *fiber.Ctx) error {
 		log.Println("Successful login.")
 
 		//creates new session
-		sess := database.CreateSession()
+		currSess, err := database.SessionStore.Get(c)
+		if err != nil {
+			log.Println("Error creating new session", err)
+			return err
+		}
 
-		//creates a cookie with session_id
-		sessCookie := new(fiber.Cookie)
-		sessCookie.Name = sess.KeyLookup
-		sessCookie.Value = sess.KeyGenerator()
+		//creates new session_id
+		if err := currSess.Regenerate(); err != nil {
+			log.Println("Error regenerating new session id", err)
+			return err
+		}
 
-		c.Cookie(sessCookie)
+		currSess.Set("user", user.Username)
+
+		log.Println("current session id: ", currSess.ID())
+		log.Println("current session keys: ", currSess.Keys())
+		log.Println("current session name: ", currSess.Get("user"))
+
+		currSess.Save()
 
 		return nil
 	}
 
 	return fiber.NewError(fiber.StatusUnauthorized)
 }
+
+func CheckAuth(c *fiber.Ctx) error {
+
+	//get the session from the current user request
+	currSess, err := database.SessionStore.Get(c)
+	if err != nil {
+		log.Println("Error. Please login again.", err)
+		return err
+	}
+
+	//checks if this session is authenticated and belongs to a user, if so continue
+	if currSess.Get("user") != nil {
+		log.Println("Session is valid and authenticated")
+		return c.Next()
+	}
+
+	//if not logged in, redirect to login page
+	log.Println("Not logged in. Please login first")
+	return c.Redirect("/")
+}
+
+//to-do
+//add logout feature

@@ -21,7 +21,7 @@ func main() {
 	}
 
 	//Initialize redis cache and session
-	database.InitRedis()
+	database.InitSession()
 
 	//Authenication middelware
 	// app.Use("/tasks", basicauth.New(basicauth.Config{
@@ -32,19 +32,22 @@ func main() {
 	// 	Authorizer: controllers.LoginAuth,
 	// }))
 
-	//ROUTES
-	//Authentication
-	app.Post("/api/login", controllers.LoginAuth)
+	//PUBLIC API ROUTES
+	apiPublic := app.Group("/api")
+	apiPublic.Post("/login", controllers.LoginAuth)
+
+	//PRIVATE API ROUTES
+	api := app.Group("/api", controllers.CheckAuth)
 
 	//Users
-	app.Get("/user/:username", controllers.GetUser)
-	app.Post("/user", controllers.CreateUser)
+	api.Get("/user/:username", controllers.GetUser)
+	api.Post("/api/user", controllers.CreateUser)
 
 	//Tasks
-	app.Get("/tasks", controllers.GetAllTasks)
-	app.Get("/tasks/:id", controllers.GetTask)
-	app.Post("/tasks", controllers.CreateTask)
-	app.Delete("/tasks/:id", controllers.DeleteTask)
+	api.Get("/tasks", controllers.GetAllTasks)
+	api.Get("/tasks/:id", controllers.CheckAuth, controllers.GetTask)
+	api.Post("/tasks", controllers.CreateTask)
+	api.Delete("/tasks/:id", controllers.DeleteTask)
 
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.SendString("Hi World! Welcome!")

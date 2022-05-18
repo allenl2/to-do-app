@@ -7,20 +7,17 @@ import (
 	"github.com/gofiber/storage/redis"
 )
 
-var Rdb *redis.Storage
+var rdb *redis.Storage
 var SessionStore *session.Store
 
-func InitRedis() {
-	Rdb = redis.New(redis.Config{
+func InitSession() *session.Store {
+	rdb = redis.New(redis.Config{
 		Port: 6379,
 	})
+	log.Println("Redis cache initialized!")
 
-	log.Println("Redis cache connected!")
-}
-
-func CreateSession() *session.Store {
 	SessionStore = session.New(session.Config{
-		Storage: Rdb,
+		Storage: rdb,
 	})
 	log.Println("Session started!")
 	return SessionStore
