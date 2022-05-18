@@ -5,6 +5,7 @@ import (
 	"to-do-app/app/database"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/basicauth"
 )
 
 func main() {
