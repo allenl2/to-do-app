@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"to-do-app/app/controllers"
 	"to-do-app/app/database"
 
@@ -12,36 +11,21 @@ func main() {
 	//Setup the server using Go Fiber
 	app := fiber.New()
 
-	//Initialize the database
+	//Initialize the database & session
 	database.Init()
-	autoMigErr := database.AutoMigrateDB()
-
-	if autoMigErr != nil {
-		log.Println("Error occurred while auto migrating database")
-	}
-
-	//Initialize redis cache and session
+	database.AutoMigrateDB()
 	database.InitSession()
-
-	//Authenication middelware
-	// app.Use("/tasks", basicauth.New(basicauth.Config{
-	// 	Users: map[string]string{
-	// 		"admin": "123456",
-	// 	},
-	// 	Realm:      "Forbidden",
-	// 	Authorizer: controllers.LoginAuth,
-	// }))
 
 	//PUBLIC API ROUTES
 	apiPublic := app.Group("/api")
 	apiPublic.Post("/login", controllers.LoginAuth)
+	apiPublic.Post("/user", controllers.CreateUser)
 
 	//PRIVATE API ROUTES
 	api := app.Group("/api", controllers.CheckAuth)
 
 	//Users
 	api.Get("/user/:username", controllers.GetUser)
-	api.Post("/api/user", controllers.CreateUser)
 
 	//Tasks
 	api.Get("/tasks", controllers.GetAllTasks)
@@ -49,8 +33,9 @@ func main() {
 	api.Post("/tasks", controllers.CreateTask)
 	api.Delete("/tasks/:id", controllers.DeleteTask)
 
+	//Base
 	app.Get("/", func(c *fiber.Ctx) error {
-		return c.SendString("Hi World! Welcome!")
+		return c.SendString("Hi World! Welcome to the Home page!")
 	})
 
 	app.Listen(":3000")

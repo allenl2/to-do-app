@@ -19,9 +19,13 @@ func GetAllTasks(c *fiber.Ctx) error {
 
 	if result.Error != nil {
 		log.Println("Unable to retrieve tasks.", result.Error.Error())
-		return fiber.NewError(fiber.StatusInternalServerError, result.Error.Error())
+		return c.Status(fiber.StatusNotFound).SendString(result.Error.Error())
 	}
-	return c.JSON(tasks)
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"success": true,
+		"data":    tasks,
+	})
 }
 
 //returns the tasks with the specified id
@@ -31,7 +35,7 @@ func GetTask(c *fiber.Ctx) error {
 
 	if err != nil {
 		log.Println("Invalid task.", err)
-		return err
+		return c.Status(fiber.StatusBadRequest).SendString("Invalid task id.")
 	}
 
 	//search for the tasks
@@ -39,9 +43,13 @@ func GetTask(c *fiber.Ctx) error {
 
 	if result.Error != nil {
 		log.Println("Unable to find task.", result.Error.Error())
-		return fiber.NewError(fiber.StatusNotFound, result.Error.Error())
+		return c.Status(fiber.StatusNotFound).SendString(result.Error.Error())
 	}
-	return c.JSON(task)
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"success": true,
+		"data":    task,
+	})
 }
 
 //creates a new task with info provided in the body
@@ -51,17 +59,20 @@ func CreateTask(c *fiber.Ctx) error {
 
 	if err != nil {
 		log.Println("Unable to create new task from data.")
-		return err
+		return c.Status(fiber.StatusBadRequest).SendString("Unable to create new task from data.")
 	}
 
 	result := database.CreateNewTask(task)
 
 	if result.Error != nil {
 		log.Println("Unable to create new task in database.", result.Error.Error())
-		return fiber.NewError(fiber.StatusInternalServerError, result.Error.Error())
+		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
 	}
-	c.Status(fiber.StatusCreated)
-	return c.JSON(task)
+
+	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
+		"success": true,
+		"data":    task,
+	})
 }
 
 //deletes the task with the specified id
@@ -71,14 +82,14 @@ func DeleteTask(c *fiber.Ctx) error {
 
 	if err != nil {
 		log.Println("Invalid task id.")
-		return err
+		return c.Status(fiber.StatusNotFound).SendString("Invalid task id.")
 	}
 
 	result := database.DeleteTask(task)
 
 	if result.Error != nil {
 		log.Println("Unable to delete task.", result.Error.Error())
-		return fiber.NewError(fiber.StatusInternalServerError, result.Error.Error())
+		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
 	}
-	return c.JSON(task)
+	return c.Status(fiber.StatusOK).SendString("Task deleted.")
 }
