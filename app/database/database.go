@@ -15,7 +15,10 @@ var err error
 func Init() *gorm.DB {
 	//get environment variables for DB
 	viper.SetConfigFile(".env")
-	viper.ReadInConfig()
+	if err := viper.ReadInConfig(); err != nil {
+		log.Println("Unable to read environment variables")
+	}
+
 	dbUser := viper.Get("dbUser").(string)
 	dbPass := viper.Get("dbPass").(string)
 
@@ -32,14 +35,12 @@ func Init() *gorm.DB {
 }
 
 //auto migrates the models into the database
-func AutoMigrateDB() error {
+func AutoMigrateDB() {
 
 	autoMigErr := DB.AutoMigrate(&models.Task{}, &models.User{})
 	if autoMigErr != nil {
 		log.Println("Error occurred while auto migrating database.")
-		return autoMigErr
 	}
-	return nil
 }
 
 func RetrieveUser(user *models.User, username string) *gorm.DB {

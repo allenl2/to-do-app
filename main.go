@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"to-do-app/app/controllers"
 	"to-do-app/app/database"
 
@@ -38,5 +39,8 @@ func main() {
 		return c.SendString("Hi World! Welcome to the Home page!")
 	})
 
-	app.Listen(":3000")
+	err := app.Listen(":3000")
+	if err != nil {
+		log.Println("Server failed to launch.")
+	}
 }

@@ -41,7 +41,12 @@ func LoginAuth(c *fiber.Ctx) error {
 		}
 
 		currSess.Set("user", user.Username)
-		currSess.Save()
+		sessErr := currSess.Save()
+		if sessErr != nil {
+			log.Println("Error saving session", err)
+			return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+		}
+
 		return c.Status(fiber.StatusOK).SendString("Success.")
 	}
 	return c.Status(fiber.StatusUnauthorized).SendString("Error. Invalid credentials.")
