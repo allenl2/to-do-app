@@ -4,6 +4,7 @@ import (
 	"log"
 	"to-do-app/app/models"
 
+	"github.com/spf13/viper"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -12,7 +13,13 @@ var DB *gorm.DB
 var err error
 
 func Init() *gorm.DB {
-	dbURL := "host=localhost user=todo password=secret dbname=todo port=5432"
+	//get environment variables for DB
+	viper.SetConfigFile(".env")
+	viper.ReadInConfig()
+	dbUser := viper.Get("dbUser").(string)
+	dbPass := viper.Get("dbPass").(string)
+
+	dbURL := "host=localhost dbname=todo port=5432 " + "user=" + dbUser + " password=" + dbPass
 	DB, err = gorm.Open(postgres.Open(dbURL), &gorm.Config{})
 
 	if err != nil {
