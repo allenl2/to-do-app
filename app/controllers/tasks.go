@@ -8,11 +8,13 @@ import (
 	"to-do-app/app/models"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/jinzhu/copier"
 )
 
 //returns all tasks
 func GetAllTasks(c *fiber.Ctx) error {
 	var tasks []models.Task
+	var resTasks []models.TaskResponse
 
 	//search for all tasks
 	result := database.RetrieveAllTasks(&tasks)
@@ -22,15 +24,18 @@ func GetAllTasks(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusNotFound).SendString(result.Error.Error())
 	}
 
+	copier.Copy(&resTasks, &tasks)
+
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"success": true,
-		"data":    tasks,
+		"data":    resTasks,
 	})
 }
 
 //returns the tasks with the specified id
 func GetTask(c *fiber.Ctx) error {
 	var task models.Task
+	var resTask models.TaskResponse
 	id, err := strconv.ParseUint(c.Params("id"), 10, 32)
 
 	if err != nil {
@@ -40,15 +45,17 @@ func GetTask(c *fiber.Ctx) error {
 
 	//search for the tasks
 	result := database.RetrieveTask(&task, uint(id))
-
+	//add handling for deleted tasks
 	if result.Error != nil {
 		log.Println("Unable to find task.", result.Error.Error())
 		return c.Status(fiber.StatusNotFound).SendString(result.Error.Error())
 	}
 
+	copier.Copy(&resTask, &task)
+
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"success": true,
-		"data":    task,
+		"data":    resTask,
 	})
 }
 
@@ -56,6 +63,7 @@ func GetTask(c *fiber.Ctx) error {
 func CreateTask(c *fiber.Ctx) error {
 	task := new(models.Task)
 	err := c.BodyParser(task)
+	var resTask models.TaskResponse
 
 	if err != nil {
 		log.Println("Unable to create new task from data.")
@@ -69,9 +77,11 @@ func CreateTask(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
 	}
 
+	copier.Copy(&resTask, &task)
+
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
 		"success": true,
-		"data":    task,
+		"data":    resTask,
 	})
 }
 

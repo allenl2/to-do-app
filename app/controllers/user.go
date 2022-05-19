@@ -7,11 +7,13 @@ import (
 
 	"github.com/alexedwards/argon2id"
 	"github.com/gofiber/fiber/v2"
+	"github.com/jinzhu/copier"
 )
 
 //searches for the user based on username
 func GetUser(c *fiber.Ctx) error {
 	var user models.User
+	var resUser models.UserResponse
 
 	//search for the user with the given username
 	result := database.RetrieveUser(&user, c.Params("username"))
@@ -20,9 +22,11 @@ func GetUser(c *fiber.Ctx) error {
 		log.Println("User not found.", result.Error.Error())
 		return c.Status(fiber.StatusNotFound).SendString("User not found.")
 	}
+
+	copier.Copy(&resUser, &user)
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"success": true,
-		"data":    user,
+		"data":    resUser,
 	})
 }
 
@@ -30,6 +34,7 @@ func GetUser(c *fiber.Ctx) error {
 func CreateUser(c *fiber.Ctx) error {
 
 	var user models.User
+	var resUser models.UserResponse
 	parseErr := c.BodyParser(&user)
 
 	if parseErr != nil {
@@ -54,8 +59,9 @@ func CreateUser(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
 	}
 
+	copier.Copy(&resUser, &user)
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
 		"success": true,
-		"data":    user,
+		"data":    resUser,
 	})
 }
