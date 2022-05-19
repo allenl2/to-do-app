@@ -17,22 +17,22 @@ func Init() *gorm.DB {
 
 	if err != nil {
 		log.Println(err)
+		return nil
 	} else {
 		log.Println("Connected to database!")
+		return DB
 	}
-
-	return DB
 }
 
 //auto migrates the models into the database
 func AutoMigrateDB() error {
-	//check that db connection is working
-	if err != nil {
-		return err
-	}
 
 	autoMigErr := DB.AutoMigrate(&models.Task{}, &models.User{})
-	return autoMigErr
+	if autoMigErr != nil {
+		log.Println("Error occurred while auto migrating database.")
+		return autoMigErr
+	}
+	return nil
 }
 
 func RetrieveUser(user *models.User, username string) *gorm.DB {

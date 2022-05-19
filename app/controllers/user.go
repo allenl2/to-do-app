@@ -18,11 +18,11 @@ func GetUser(c *fiber.Ctx) error {
 
 	if result.Error != nil {
 		log.Println("User not found.", result.Error.Error())
-		return fiber.NewError(fiber.StatusNotFound, result.Error.Error())
+		return c.Status(fiber.StatusNotFound).SendString("User not found.")
 	}
-	return c.JSON(models.User{
-		Username: user.Username,
-		Password: user.Password,
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"success": true,
+		"data":    user,
 	})
 }
 
@@ -34,14 +34,14 @@ func CreateUser(c *fiber.Ctx) error {
 
 	if parseErr != nil {
 		log.Println("Unable to create new user.", parseErr)
-		return fiber.NewError(fiber.StatusBadRequest, parseErr.Error())
+		return c.Status(fiber.StatusBadRequest).SendString(parseErr.Error())
 	}
 
 	hash, hashErr := argon2id.CreateHash(user.Password, argon2id.DefaultParams)
 
 	if hashErr != nil {
 		log.Println("Unable to create new user.", hashErr)
-		return fiber.NewError(fiber.StatusInternalServerError, hashErr.Error())
+		return c.Status(fiber.StatusInternalServerError).SendString(hashErr.Error())
 	}
 
 	user.Password = hash
@@ -51,12 +51,11 @@ func CreateUser(c *fiber.Ctx) error {
 
 	if result.Error != nil {
 		log.Println("Unable to add user.", result.Error.Error())
-		return fiber.NewError(fiber.StatusInternalServerError, result.Error.Error())
+		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
 	}
 
-	c.Status(fiber.StatusCreated)
-	return c.JSON(models.User{
-		Username: user.Username,
-		Password: user.Password,
+	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
+		"success": true,
+		"data":    user,
 	})
 }
