@@ -15,7 +15,7 @@ func LoginAuth(c *fiber.Ctx) error {
 	enteredPass := user.Password
 
 	//search for the user in DB based on username
-	result := database.RetrieveUser(&user, user.Username)
+	result := database.RetrieveUserByUsername(&user, user.Username)
 
 	//check if the entered password matches the hashed password
 	match, hashErr := argon2id.ComparePasswordAndHash(enteredPass, user.Password)
@@ -41,7 +41,12 @@ func LoginAuth(c *fiber.Ctx) error {
 		}
 
 		currSess.Set("user", user.Username)
-		currSess.Save()
+		sessErr := currSess.Save()
+		if sessErr != nil {
+			log.Println("Error saving session", err)
+			return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+		}
+
 		return c.Status(fiber.StatusOK).SendString("Success.")
 	}
 	return c.Status(fiber.StatusUnauthorized).SendString("Error. Invalid credentials.")
@@ -58,7 +63,6 @@ func CheckAuth(c *fiber.Ctx) error {
 
 	//checks if this session is authenticated and belongs to a user, if so continue
 	if currSess.Get("user") != nil {
-		log.Println("Session is valid and authenticated.")
 		return c.Next()
 	}
 

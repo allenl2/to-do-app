@@ -1,11 +1,11 @@
 package main
 
 import (
+	"log"
 	"to-do-app/app/controllers"
 	"to-do-app/app/database"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/basicauth"
 )
 
 func main() {
@@ -26,18 +26,23 @@ func main() {
 	api := app.Group("/api", controllers.CheckAuth)
 
 	//Users
-	api.Get("/user/:username", controllers.GetUser)
+	api.Get("/user/:id", controllers.GetUser)
+	api.Patch("/user/:id", controllers.UpdateUser)
 
 	//Tasks
 	api.Get("/tasks", controllers.GetAllTasks)
-	api.Get("/tasks/:id", controllers.CheckAuth, controllers.GetTask)
+	api.Get("/tasks/:id", controllers.GetTask)
 	api.Post("/tasks", controllers.CreateTask)
 	api.Delete("/tasks/:id", controllers.DeleteTask)
+	api.Patch("/tasks/:id", controllers.UpdateTask)
 
 	//Base
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.SendString("Hi World! Welcome to the Home page!")
 	})
 
-	app.Listen(":3000")
+	err := app.Listen(":3000")
+	if err != nil {
+		log.Println("Server failed to launch.")
+	}
 }
