@@ -30,7 +30,7 @@ func main() {
 
 	//Tasks
 	api.Get("/tasks", controllers.GetAllTasks)
-	api.Get("/tasks/:id", controllers.CheckAuth, controllers.GetTask)
+	api.Get("/tasks/:id", controllers.GetTask)
 	api.Post("/tasks", controllers.CreateTask)
 	api.Delete("/tasks/:id", controllers.DeleteTask)
 

@@ -20,10 +20,14 @@ func GetUser(c *fiber.Ctx) error {
 
 	if result.Error != nil {
 		log.Println("User not found.", result.Error.Error())
-		return c.Status(fiber.StatusNotFound).SendString("User not found.")
+		return c.Status(fiber.StatusNotFound).SendString(result.Error.Error())
 	}
 
-	copier.Copy(&resUser, &user)
+	if err := copier.Copy(&resUser, &user); err != nil {
+		log.Println("Unable to return user. Copying error.", err.Error())
+		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+	}
+
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"success": true,
 		"data":    resUser,
@@ -59,7 +63,11 @@ func CreateUser(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
 	}
 
-	copier.Copy(&resUser, &user)
+	if err := copier.Copy(&resUser, &user); err != nil {
+		log.Println("Unable to add user. Copying error.", err.Error())
+		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+	}
+
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
 		"success": true,
 		"data":    resUser,

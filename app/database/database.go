@@ -56,7 +56,7 @@ func RetrieveAllTasks(tasks *[]models.Task) *gorm.DB {
 }
 
 func RetrieveTask(task *models.Task, id uint) *gorm.DB {
-	return DB.Where(&models.Task{ID: id}).Find(task)
+	return DB.Where(&models.Task{ID: id}).First(task)
 }
 
 func CreateNewTask(task *models.Task) *gorm.DB {

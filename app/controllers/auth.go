@@ -63,7 +63,6 @@ func CheckAuth(c *fiber.Ctx) error {
 
 	//checks if this session is authenticated and belongs to a user, if so continue
 	if currSess.Get("user") != nil {
-		log.Println("Session is valid and authenticated.")
 		return c.Next()
 	}
 

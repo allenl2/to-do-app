@@ -24,7 +24,10 @@ func GetAllTasks(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusNotFound).SendString(result.Error.Error())
 	}
 
-	copier.Copy(&resTasks, &tasks)
+	if err := copier.Copy(&resTasks, &tasks); err != nil {
+		log.Println("Unable to retrieve tasks. Copying error.", err.Error())
+		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+	}
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"success": true,
@@ -45,13 +48,16 @@ func GetTask(c *fiber.Ctx) error {
 
 	//search for the tasks
 	result := database.RetrieveTask(&task, uint(id))
-	//add handling for deleted tasks
+
 	if result.Error != nil {
 		log.Println("Unable to find task.", result.Error.Error())
 		return c.Status(fiber.StatusNotFound).SendString(result.Error.Error())
 	}
 
-	copier.Copy(&resTask, &task)
+	if err := copier.Copy(&resTask, &task); err != nil {
+		log.Println("Unable to retrieve task. Copying error.", err.Error())
+		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+	}
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"success": true,
@@ -77,7 +83,10 @@ func CreateTask(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
 	}
 
-	copier.Copy(&resTask, &task)
+	if err := copier.Copy(&resTask, &task); err != nil {
+		log.Println("Unable to create task. Copying error.", err.Error())
+		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+	}
 
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
 		"success": true,
