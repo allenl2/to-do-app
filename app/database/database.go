@@ -43,13 +43,25 @@ func AutoMigrateDB() {
 	}
 }
 
-func RetrieveUser(user *models.User, username string) *gorm.DB {
+//User DB Functions
+
+func RetrieveUser(user *models.User, id uint) *gorm.DB {
+	return DB.Where(&models.User{ID: id}).First(user)
+}
+
+func RetrieveUserByUsername(user *models.User, username string) *gorm.DB {
 	return DB.Where(&models.User{Username: username}).First(user)
 }
 
 func CreateNewUser(user *models.User) *gorm.DB {
 	return DB.Create(user)
 }
+
+func UpdateUser(user *models.User) *gorm.DB {
+	return DB.Save(user)
+}
+
+//Tasks DB Functions
 
 func RetrieveAllTasks(tasks *[]models.Task) *gorm.DB {
 	return DB.Find(tasks)

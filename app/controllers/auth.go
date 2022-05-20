@@ -15,7 +15,7 @@ func LoginAuth(c *fiber.Ctx) error {
 	enteredPass := user.Password
 
 	//search for the user in DB based on username
-	result := database.RetrieveUser(&user, user.Username)
+	result := database.RetrieveUserByUsername(&user, user.Username)
 
 	//check if the entered password matches the hashed password
 	match, hashErr := argon2id.ComparePasswordAndHash(enteredPass, user.Password)

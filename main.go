@@ -26,7 +26,8 @@ func main() {
 	api := app.Group("/api", controllers.CheckAuth)
 
 	//Users
-	api.Get("/user/:username", controllers.GetUser)
+	api.Get("/user/:id", controllers.GetUser)
+	api.Patch("/user/:id", controllers.UpdateUser)
 
 	//Tasks
 	api.Get("/tasks", controllers.GetAllTasks)
