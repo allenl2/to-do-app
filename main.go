@@ -34,6 +34,7 @@ func main() {
 	api.Get("/tasks/:id", controllers.GetTask)
 	api.Post("/tasks", controllers.CreateTask)
 	api.Delete("/tasks/:id", controllers.DeleteTask)
+	api.Patch("/tasks/:id", controllers.UpdateTask)
 
 	//Base
 	app.Get("/", func(c *fiber.Ctx) error {

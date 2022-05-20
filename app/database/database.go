@@ -75,6 +75,10 @@ func CreateNewTask(task *models.Task) *gorm.DB {
 	return DB.Create(task)
 }
 
-func DeleteTask(task *models.Task) *gorm.DB {
-	return DB.Delete(task)
+func DeleteTask(id uint) *gorm.DB {
+	return DB.Delete(&models.Task{}, id)
+}
+
+func UpdateTask(task *models.Task) *gorm.DB {
+	return DB.Save(task)
 }

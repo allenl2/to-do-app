@@ -46,7 +46,7 @@ func GetTask(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).SendString("Invalid task id.")
 	}
 
-	//search for the tasks
+	//search for the task
 	result := database.RetrieveTask(&task, uint(id))
 
 	if result.Error != nil {
@@ -96,19 +96,72 @@ func CreateTask(c *fiber.Ctx) error {
 
 //deletes the task with the specified id
 func DeleteTask(c *fiber.Ctx) error {
-	id, err := c.ParamsInt("id")
-	task := &models.Task{ID: uint(id)}
+	id, err := strconv.ParseUint(c.Params("id"), 10, 32)
 
 	if err != nil {
 		log.Println("Invalid task id.")
 		return c.Status(fiber.StatusNotFound).SendString("Invalid task id.")
 	}
 
-	result := database.DeleteTask(task)
+	result := database.DeleteTask(uint(id))
 
 	if result.Error != nil {
 		log.Println("Unable to delete task.", result.Error.Error())
 		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
 	}
+	if result.RowsAffected == 0 {
+		log.Println("Task not found.")
+		return c.Status(fiber.StatusNotFound).SendString("Task not found.")
+	}
+
 	return c.Status(fiber.StatusOK).SendString("Task deleted.")
+}
+
+//update the details of the specified task
+func UpdateTask(c *fiber.Ctx) error {
+	var dbTask models.Task
+	var inputTask models.Task
+	var resTask models.TaskResponse
+
+	id, err := strconv.ParseUint(c.Params("id"), 10, 32)
+	parseErr := c.BodyParser(&inputTask)
+
+	if err != nil || parseErr != nil {
+		log.Println("Invalid input.", err)
+		return c.Status(fiber.StatusBadRequest).SendString("Invalid input.")
+	}
+
+	//search for the task with the given id
+	if res := database.RetrieveTask(&dbTask, uint(id)); res.Error != nil {
+		log.Println("Task not found.", res.Error.Error())
+		return c.Status(fiber.StatusNotFound).SendString(res.Error.Error())
+	}
+
+	//update any fields that are provided
+	if inputTask.TaskName != "" {
+		dbTask.TaskName = inputTask.TaskName
+	}
+	if inputTask.Assignee != "" {
+		dbTask.Assignee = inputTask.Assignee
+	}
+	if inputTask.Status != "" {
+		dbTask.Status = inputTask.Status
+	}
+
+	//save the changes to the DB
+	if res := database.UpdateTask(&dbTask); res.Error != nil {
+		log.Println("Unable to update task.", res.Error.Error())
+		return c.Status(fiber.StatusInternalServerError).SendString(res.Error.Error())
+	}
+
+	//create response object
+	if err := copier.Copy(&resTask, &dbTask); err != nil {
+		log.Println("Unable to update task. Copying error.", err.Error())
+		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"success": true,
+		"data":    resTask,
+	})
 }

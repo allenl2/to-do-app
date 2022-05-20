@@ -81,6 +81,7 @@ func CreateUser(c *fiber.Ctx) error {
 	})
 }
 
+//updates the details of the specified user
 func UpdateUser(c *fiber.Ctx) error {
 	var dbUser models.User
 	var inputUser models.User
@@ -121,7 +122,7 @@ func UpdateUser(c *fiber.Ctx) error {
 
 	//create response object
 	if err := copier.Copy(&resUser, &dbUser); err != nil {
-		log.Println("Unable to add user. Copying error.", err.Error())
+		log.Println("Unable to update user. Copying error.", err.Error())
 		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
 	}
 
