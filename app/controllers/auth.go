@@ -46,10 +46,11 @@ func LoginAuth(c *fiber.Ctx) error {
 			log.Println("Error saving session", err)
 			return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
 		}
-
-		return c.Status(fiber.StatusOK).SendString("Success.")
+		c.Status(fiber.StatusOK).SendString("Successful login.")
+		return c.Redirect("../home")
 	}
-	return c.Status(fiber.StatusUnauthorized).SendString("Error. Invalid credentials.")
+	c.Status(fiber.StatusUnauthorized).SendString("Error. Invalid credentials.")
+	return c.Redirect("../")
 }
 
 func CheckAuth(c *fiber.Ctx) error {

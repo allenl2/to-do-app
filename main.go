@@ -6,11 +6,17 @@ import (
 	"to-do-app/app/database"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/template/html"
 )
 
 func main() {
+	//initialize Go html template engine
+	engine := html.New("./app/views", ".html")
+
 	//Setup the server using Go Fiber
-	app := fiber.New()
+	app := fiber.New(fiber.Config{
+		Views: engine,
+	})
 
 	//Initialize the database & session
 	database.Init()
@@ -36,9 +42,20 @@ func main() {
 	api.Delete("/tasks/:id", controllers.DeleteTask)
 	api.Patch("/tasks/:id", controllers.UpdateTask)
 
+	//Static files
+	app.Static("/", "static")
+
 	//Base
 	app.Get("/", func(c *fiber.Ctx) error {
-		return c.SendString("Hi World! Welcome to the Home page!")
+		return c.Render("index", fiber.Map{
+			"Title": "Hello, World!",
+		})
+	})
+
+	app.Get("/home", func(c *fiber.Ctx) error {
+		return c.Render("home", fiber.Map{
+			"Title": "Hello, World!",
+		})
 	})
 
 	err := app.Listen(":3000")
