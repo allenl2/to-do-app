@@ -4,6 +4,7 @@ import (
 	"log"
 	"to-do-app/app/controllers"
 	"to-do-app/app/database"
+	"to-do-app/app/models"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/template/html"
@@ -43,7 +44,7 @@ func main() {
 	api.Patch("/tasks/:id", controllers.UpdateTask)
 
 	//Static files
-	app.Static("/", "static")
+	app.Static("/static", "./static")
 
 	//Base
 	app.Get("/", func(c *fiber.Ctx) error {
@@ -55,6 +56,11 @@ func main() {
 	app.Get("/home", func(c *fiber.Ctx) error {
 		return c.Render("home", fiber.Map{
 			"Title": "Hello, World!",
+			"Tasks": []models.TaskResponse{
+				{TaskName: "Buy groceries", Status: "done"},
+				{TaskName: "Buy tickets", Status: "done"},
+				{TaskName: "Buy bus pass", Status: "inprogress"},
+			},
 		})
 	})
 

@@ -49,8 +49,8 @@ func LoginAuth(c *fiber.Ctx) error {
 		c.Status(fiber.StatusOK).SendString("Successful login.")
 		return c.Redirect("../home")
 	}
-	c.Status(fiber.StatusUnauthorized).SendString("Error. Invalid credentials.")
-	return c.Redirect("../")
+
+	return c.Status(fiber.StatusUnauthorized).SendString("Error. Invalid credentials.")
 }
 
 func CheckAuth(c *fiber.Ctx) error {
