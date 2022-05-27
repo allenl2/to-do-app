@@ -26,6 +26,7 @@ func main() {
 	//PUBLIC API ROUTES
 	apiPublic := app.Group("/api")
 	apiPublic.Post("/login", controllers.LoginAuth)
+	apiPublic.Post("/logout", controllers.LogoutAuth)
 	apiPublic.Post("/user", controllers.CreateUser)
 
 	//PRIVATE API ROUTES

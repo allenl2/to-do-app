@@ -177,22 +177,32 @@ func UpdateTask(c *fiber.Ctx) error {
 	})
 }
 
+//renders all the tasks of the current user
 func RenderTasks(c *fiber.Ctx) error {
-	var tasks []models.Task
-	var resTasks []models.TaskResponse
+	var user models.User
 
-	result := database.RetrieveAllTasks(&tasks)
+	currSess, sessErr := database.SessionStore.Get(c)
+
+	if sessErr != nil {
+		log.Println("Unable to create new task from data. User session error.")
+		return c.Status(fiber.StatusInternalServerError).SendString("Unable to create new task from data.  User session error.")
+	}
+
+	result := database.RetrieveUser(&user, currSess.Get("userID").(uint))
+
+	//result := database.RetrieveAllTasks(&tasks)
 	if result.Error != nil {
 		log.Println("Unable to retrieve tasks.", result.Error.Error())
 		return c.Status(fiber.StatusNotFound).SendString(result.Error.Error())
 	}
 
-	if err := copier.Copy(&resTasks, &tasks); err != nil {
-		log.Println("Unable to retrieve tasks. Copying error.", err.Error())
-		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
-	}
+	// if err := copier.Copy(&resUser, &user); err != nil {
+	// 	log.Println("Unable to retrieve tasks. Copying error.", err.Error())
+	// 	return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+	// }
 
 	return c.Render("home", fiber.Map{
-		"Tasks": resTasks,
+		"Username": user.Username,
+		"Tasks":    user.Tasks,
 	})
 }
