@@ -11,7 +11,7 @@ import (
 	"github.com/jinzhu/copier"
 )
 
-//searches for the user based on username
+//searches for the user based on id
 func GetUser(c *fiber.Ctx) error {
 	var user models.User
 	var resUser models.UserResponse

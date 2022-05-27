@@ -65,8 +65,9 @@ func GetTask(c *fiber.Ctx) error {
 	})
 }
 
-//creates a new task with info provided in the body
+//creates a new task with info provided in the body, associated with current user
 func CreateTask(c *fiber.Ctx) error {
+
 	task := new(models.Task)
 	err := c.BodyParser(task)
 	var resTask models.TaskResponse
@@ -75,6 +76,16 @@ func CreateTask(c *fiber.Ctx) error {
 		log.Println("Unable to create new task from data.")
 		return c.Status(fiber.StatusBadRequest).SendString("Unable to create new task from data.")
 	}
+
+	currSess, sessErr := database.SessionStore.Get(c)
+
+	if sessErr != nil {
+		log.Println("Unable to create new task from data. User session error.")
+		return c.Status(fiber.StatusInternalServerError).SendString("Unable to create new task from data.  User session error.")
+	}
+
+	task.UserID = currSess.Get("userID").(uint)
+	task.Assignee = currSess.Get("username").(string)
 
 	result := database.CreateNewTask(task)
 
@@ -163,5 +174,35 @@ func UpdateTask(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"success": true,
 		"data":    resTask,
+	})
+}
+
+//renders all the tasks of the current user
+func RenderTasks(c *fiber.Ctx) error {
+	var user models.User
+
+	currSess, sessErr := database.SessionStore.Get(c)
+
+	if sessErr != nil {
+		log.Println("Unable to create new task from data. User session error.")
+		return c.Status(fiber.StatusInternalServerError).SendString("Unable to create new task from data.  User session error.")
+	}
+
+	result := database.RetrieveUser(&user, currSess.Get("userID").(uint))
+
+	//result := database.RetrieveAllTasks(&tasks)
+	if result.Error != nil {
+		log.Println("Unable to retrieve tasks.", result.Error.Error())
+		return c.Status(fiber.StatusNotFound).SendString(result.Error.Error())
+	}
+
+	// if err := copier.Copy(&resUser, &user); err != nil {
+	// 	log.Println("Unable to retrieve tasks. Copying error.", err.Error())
+	// 	return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+	// }
+
+	return c.Render("home", fiber.Map{
+		"Username": user.Username,
+		"Tasks":    user.Tasks,
 	})
 }

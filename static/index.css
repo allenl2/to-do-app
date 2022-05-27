@@ -1,0 +1,25 @@
+
+.topbar {
+    background-color: lightblue;
+}
+
+#subheading {
+    font-style: italic;
+    font-weight: 100;
+}
+
+.nav {
+    background-color: aliceblue;
+}
+
+.nav-link {
+    color: black;
+}
+
+#user-welcome {
+    font-style: italic;
+    color: rgb(24, 34, 67);
+    font-weight: 200;
+    font-size: 20px;
+}
+

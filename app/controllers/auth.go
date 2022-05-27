@@ -40,16 +40,36 @@ func LoginAuth(c *fiber.Ctx) error {
 			return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
 		}
 
-		currSess.Set("user", user.Username)
+		currSess.Set("username", user.Username)
+		currSess.Set("userID", user.ID)
+
 		sessErr := currSess.Save()
 		if sessErr != nil {
 			log.Println("Error saving session", err)
 			return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
 		}
+		return c.Status(fiber.StatusOK).SendString("Successful login.")
 
-		return c.Status(fiber.StatusOK).SendString("Success.")
 	}
+
 	return c.Status(fiber.StatusUnauthorized).SendString("Error. Invalid credentials.")
+}
+
+func LogoutAuth(c *fiber.Ctx) error {
+	currSess, err := database.SessionStore.Get(c)
+
+	if err != nil {
+		log.Println("Error getting new session", err)
+		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+	}
+
+	if err := currSess.Destroy(); err != nil {
+		log.Println("Cannot destroy session", err)
+		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+	}
+
+	return c.Status(fiber.StatusOK).SendString("Successful logged out.")
+
 }
 
 func CheckAuth(c *fiber.Ctx) error {
@@ -62,7 +82,7 @@ func CheckAuth(c *fiber.Ctx) error {
 	}
 
 	//checks if this session is authenticated and belongs to a user, if so continue
-	if currSess.Get("user") != nil {
+	if currSess.Get("username") != nil {
 		return c.Next()
 	}
 

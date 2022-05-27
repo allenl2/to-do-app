@@ -46,7 +46,7 @@ func AutoMigrateDB() {
 //User DB Functions
 
 func RetrieveUser(user *models.User, id uint) *gorm.DB {
-	return DB.Where(&models.User{ID: id}).First(user)
+	return DB.Where(&models.User{ID: id}).Preload("Tasks").First(user)
 }
 
 func RetrieveUserByUsername(user *models.User, username string) *gorm.DB {
