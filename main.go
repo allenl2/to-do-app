@@ -4,7 +4,6 @@ import (
 	"log"
 	"to-do-app/app/controllers"
 	"to-do-app/app/database"
-	"to-do-app/app/models"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/template/html"
@@ -53,16 +52,7 @@ func main() {
 		})
 	})
 
-	app.Get("/home", func(c *fiber.Ctx) error {
-		return c.Render("home", fiber.Map{
-			"Title": "Hello, World!",
-			"Tasks": []models.TaskResponse{
-				{TaskName: "Buy groceries", Status: "done"},
-				{TaskName: "Buy tickets", Status: "done"},
-				{TaskName: "Buy bus pass", Status: "inprogress"},
-			},
-		})
-	})
+	app.Get("/home", controllers.CheckAuth, controllers.RenderTasks)
 
 	err := app.Listen(":3000")
 	if err != nil {

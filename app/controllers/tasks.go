@@ -165,3 +165,23 @@ func UpdateTask(c *fiber.Ctx) error {
 		"data":    resTask,
 	})
 }
+
+func RenderTasks(c *fiber.Ctx) error {
+	var tasks []models.Task
+	var resTasks []models.TaskResponse
+
+	result := database.RetrieveAllTasks(&tasks)
+	if result.Error != nil {
+		log.Println("Unable to retrieve tasks.", result.Error.Error())
+		return c.Status(fiber.StatusNotFound).SendString(result.Error.Error())
+	}
+
+	if err := copier.Copy(&resTasks, &tasks); err != nil {
+		log.Println("Unable to retrieve tasks. Copying error.", err.Error())
+		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+	}
+
+	return c.Render("home", fiber.Map{
+		"Tasks": resTasks,
+	})
+}
