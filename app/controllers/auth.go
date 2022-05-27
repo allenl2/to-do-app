@@ -40,14 +40,16 @@ func LoginAuth(c *fiber.Ctx) error {
 			return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
 		}
 
-		currSess.Set("user", user.Username)
+		currSess.Set("username", user.Username)
+		currSess.Set("userID", user.ID)
+
 		sessErr := currSess.Save()
 		if sessErr != nil {
 			log.Println("Error saving session", err)
 			return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
 		}
 		c.Status(fiber.StatusOK).SendString("Successful login.")
-		return c.Redirect("../home")
+		return c.Redirect("/home")
 	}
 
 	return c.Status(fiber.StatusUnauthorized).SendString("Error. Invalid credentials.")
@@ -63,7 +65,7 @@ func CheckAuth(c *fiber.Ctx) error {
 	}
 
 	//checks if this session is authenticated and belongs to a user, if so continue
-	if currSess.Get("user") != nil {
+	if currSess.Get("username") != nil {
 		return c.Next()
 	}
 

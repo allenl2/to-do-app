@@ -10,6 +10,7 @@ type Task struct {
 	TaskName string
 	Assignee string
 	Status   string
+	UserID   uint
 }
 
 type TaskResponse struct {
@@ -17,4 +18,5 @@ type TaskResponse struct {
 	TaskName string
 	Assignee string
 	Status   string
+	UserID   uint
 }

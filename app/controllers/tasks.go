@@ -65,8 +65,9 @@ func GetTask(c *fiber.Ctx) error {
 	})
 }
 
-//creates a new task with info provided in the body
+//creates a new task with info provided in the body, associated with current user
 func CreateTask(c *fiber.Ctx) error {
+
 	task := new(models.Task)
 	err := c.BodyParser(task)
 	var resTask models.TaskResponse
@@ -75,6 +76,16 @@ func CreateTask(c *fiber.Ctx) error {
 		log.Println("Unable to create new task from data.")
 		return c.Status(fiber.StatusBadRequest).SendString("Unable to create new task from data.")
 	}
+
+	currSess, sessErr := database.SessionStore.Get(c)
+
+	if sessErr != nil {
+		log.Println("Unable to create new task from data. User session error.")
+		return c.Status(fiber.StatusInternalServerError).SendString("Unable to create new task from data.  User session error.")
+	}
+
+	task.UserID = currSess.Get("userID").(uint)
+	task.Assignee = currSess.Get("username").(string)
 
 	result := database.CreateNewTask(task)
 
