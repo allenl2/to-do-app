@@ -54,6 +54,9 @@ func main() {
 	})
 
 	app.Get("/home", controllers.CheckAuth, controllers.RenderTasks)
+	app.Get("/register", func(c *fiber.Ctx) error {
+		return c.Render("register", fiber.Map{})
+	})
 
 	err := app.Listen(":3000")
 	if err != nil {
