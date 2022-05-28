@@ -1,11 +1,13 @@
-console.log("welcome");
-
 const form = document.getElementById("login-form");
 const username = document.getElementById("username");
 const password = document.getElementById("password");
 
+const signupBtn = document.getElementById("signup-btn");
+
+
 $(document).ready(function() {
     form.addEventListener('submit', handleLogin);
+    signupBtn.addEventListener('click', handleSignUp);
 })
 
 async function handleLogin(event) {
@@ -42,8 +44,16 @@ async function handleLogin(event) {
             if(res.ok) {
                 window.location.assign("/home")
             }
+            else {
+                alert("Unable to login. Pleae try again.")
+            }
         })
-        .catch((err) => {
+        .catch(err => {
             console.log(err)
+            alert("Unable to login. Please try again.")
         })
+}
+
+function handleSignUp() {
+    window.location.assign("/register")
 }

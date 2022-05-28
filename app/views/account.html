@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    
+        <title>Account</title>
+
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css" integrity="sha384-zCbKRCUGaJDkqS1kPbPd7TveP5iyJE0EjAuZQTgFLD2ylzuqKfdKlfG/eSrtxUkn" crossorigin="anonymous">
+        <link rel="stylesheet" href="/static/index.css">
+    </head>
+    <body>
+        <div class="container-fluid topbar p-3">
+            <div class="row justify-content-center align-content-center">
+                <div class="col-xs-12">
+                    <h1 class="text-center">To-Do List</h1>
+                    <h4 class="text-center" id="subheading">Track all your tasks!</h4>
+                </div>
+            </div>
+        </div>
+
+        <nav class="nav justify-content-end">
+            <a class="nav-link" href="/home">Home</a>
+            <a class="nav-link" id="logoutBtn">Logout</a>
+        </nav>
+
+        <div class="container p-5 border rounded-lg mt-5 mb-3">
+            <div class="row">
+                <h3>Account Info</h3>
+            </div>
+            <form id="account-form">
+                <div class="row mt-2">
+                    <div class="form-group col-sm-12 col-md-6">
+                        <label for="username">Username</label>
+                        <input type="username" class="form-control" id="username" value="{{.Username}}" aria-describedby="Username">
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <button type="button" onclick=accountFormClick() class="btn btn-primary col-md-3 col-lg-2 ml-3">Save</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="container p-5 border rounded-lg">
+            <div class="row">
+                <h3>Edit Password</h3>
+            </div>
+            <form id="password-form">
+                <div class="row mt-2">
+                    <!-- <div class="form-group col-sm-12 col-md-6">
+                        <label for="oldPassword">Current Password</label>
+                        <input type="password" class="form-control" id="oldPassword" aria-describedby="Password">
+                    </div> -->
+                    <div class="form-group col-sm-12 col-md-6">
+                        <label for="newPassword">New Password</label>
+                        <input type="password" class="form-control" id="newPassword" aria-describedby="Password">
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <button type="button" onclick=passwordFormClick() class="btn btn-primary col-md-3 col-lg-2 ml-3">Save</button>
+                </div>
+            </form>
+        </div>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-fQybjgWLrvvRgtW6bFlB7jaZrFsaBXjsOMm/tB9LTS58ONXgqbR9W8oWht/amnpF" crossorigin="anonymous"></script>
+        <script src="/static/account.js"></script>
+        <script>
+            function accountFormClick(){
+                handleAccountForm("{{.UserID}}");
+            }
+            function passwordFormClick(){
+                handlePasswordForm("{{.UserID}}");
+            }
+        </script>
+    </body>
+</html>
