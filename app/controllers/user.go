@@ -131,3 +131,27 @@ func UpdateUser(c *fiber.Ctx) error {
 		"data":    resUser,
 	})
 }
+
+//renders the account details on the Account page
+func RenderAccount(c *fiber.Ctx) error {
+	var user models.User
+	currSess, sessErr := database.SessionStore.Get(c)
+
+	if sessErr != nil {
+		log.Println("Unable to get user info.")
+		return c.Status(fiber.StatusInternalServerError).SendString("Unable to get user info.")
+	}
+
+	result := database.RetrieveUser(&user, currSess.Get("userID").(uint))
+
+	if result.Error != nil {
+		log.Println("Unable to retrieve user.", result.Error.Error())
+		return c.Status(fiber.StatusNotFound).SendString(result.Error.Error())
+	}
+
+	return c.Render("account", fiber.Map{
+		"Username": user.Username,
+		"UserID":   user.ID,
+	})
+
+}

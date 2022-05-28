@@ -190,16 +190,10 @@ func RenderTasks(c *fiber.Ctx) error {
 
 	result := database.RetrieveUser(&user, currSess.Get("userID").(uint))
 
-	//result := database.RetrieveAllTasks(&tasks)
 	if result.Error != nil {
 		log.Println("Unable to retrieve tasks.", result.Error.Error())
 		return c.Status(fiber.StatusNotFound).SendString(result.Error.Error())
 	}
-
-	// if err := copier.Copy(&resUser, &user); err != nil {
-	// 	log.Println("Unable to retrieve tasks. Copying error.", err.Error())
-	// 	return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
-	// }
 
 	return c.Render("home", fiber.Map{
 		"Username": user.Username,
