@@ -198,5 +198,6 @@ func RenderTasks(c *fiber.Ctx) error {
 	return c.Render("home", fiber.Map{
 		"Username": user.Username,
 		"Tasks":    user.Tasks,
+		"ID":       user.ID,
 	})
 }
