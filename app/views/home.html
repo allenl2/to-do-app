@@ -49,19 +49,22 @@
                 <table class="table border" id="task-table">
                     <thead>
                         <tr>
+                            <th scope="col">Done</th>
                             <th scope="col">Task</th>
-                            <th scope="col">Status</th>
-                            <th scope="col"></th>
+                            <th scope="col">Delete</th>
                         </tr>
                     </thead>
                     <tbody>
                         {{range .Tasks}}
                         <tr>
+                            <td><div class="form-check">
+                                <input class="form-check-input" type="checkbox" taskID="{{.ID}}" value="" {{if .IsDone}} {{`checked`}} {{end}}>
+                            </div></td>
                             <td>{{.TaskName}}</td>
-                            <td>{{.Status}}</td>
                             <td><button type="button" class="btn btn-outline-danger delete-btn" taskID="{{.ID}}">
                                 <i class="bi bi-trash3"></i>
                             </button></td>
+                            
                         </tr>
                         {{end}}
                     </tbody>

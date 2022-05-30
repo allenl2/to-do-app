@@ -155,8 +155,8 @@ func UpdateTask(c *fiber.Ctx) error {
 	if inputTask.Assignee != "" {
 		dbTask.Assignee = inputTask.Assignee
 	}
-	if inputTask.Status != "" {
-		dbTask.Status = inputTask.Status
+	if inputTask.IsDone != dbTask.IsDone {
+		dbTask.IsDone = inputTask.IsDone
 	}
 
 	//save the changes to the DB
