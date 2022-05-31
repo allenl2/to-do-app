@@ -51,6 +51,7 @@
                         <tr>
                             <th scope="col">Done</th>
                             <th scope="col">Task</th>
+                            <th scope="col">Edit</th>
                             <th scope="col">Delete</th>
                         </tr>
                     </thead>
@@ -60,16 +61,19 @@
                             <td><div class="form-check">
                                 <input class="form-check-input" type="checkbox" taskID="{{.ID}}" value="" {{if .IsDone}} {{`checked`}} {{end}}>
                             </div></td>
-                            <td>{{.TaskName}}</td>
+                            <td class="task-content">{{.TaskName}}</td>
+                            <td><button type="button" class="btn btn-outline-secondary edit-btn" taskID="{{.ID}}" data-toggle="modal" data-target="#edit-modal">
+                                <i class="bi bi-pencil"></i>
+                            </button></td>
                             <td><button type="button" class="btn btn-outline-danger delete-btn" taskID="{{.ID}}">
                                 <i class="bi bi-trash3"></i>
                             </button></td>
-                            
                         </tr>
                         {{end}}
                     </tbody>
                   </table>
             </div>
+            {{template "editModal" .}}
         </div>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-fQybjgWLrvvRgtW6bFlB7jaZrFsaBXjsOMm/tB9LTS58ONXgqbR9W8oWht/amnpF" crossorigin="anonymous"></script>
