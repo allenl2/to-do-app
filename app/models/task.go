@@ -9,7 +9,7 @@ type Task struct {
 	ID       uint
 	TaskName string
 	Assignee string
-	Status   string
+	IsDone   bool `gorm:"default:false" json:"isDone"`
 	UserID   uint
 }
 
@@ -17,6 +17,6 @@ type TaskResponse struct {
 	ID       uint
 	TaskName string
 	Assignee string
-	Status   string
+	IsDone   bool `gorm:"default:false" json:"isDone"`
 	UserID   uint
 }
