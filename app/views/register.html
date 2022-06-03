@@ -24,17 +24,29 @@
             <div class="row justify-content-center mb-4">
                 <h3>Sign Up</h3>
             </div>
-            <form id="register-form">
+            <form id="register-form" class="needs-validation" novalidate>
                 <div class="row justify-content-center">
                     <div class="form-group col-5">
                         <label for="username">Username</label>
-                        <input type="username" class="form-control" id="username" aria-describedby="Username">
+                        <input type="text" class="form-control" id="username" required minlength="5" maxlength="16" pattern="^[a-zA-Z0-9_]+$" aria-describedby="Username">
+                        <div class="invalid-feedback">
+                            Must have 5-16 characters, using only letters and numbers.
+                        </div>
                     </div>
                 </div>
                 <div class="row justify-content-center">
                     <div class="form-group col-5">
                         <label for="password">Password</label>
-                        <input type="password" class="form-control" id="password">
+                        <input type="password" class="form-control" id="password" required minlength="8" maxlength="20" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])[A-Za-z0-9]{8,}$">
+                        <!-- ^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$ -->
+                        <div class="invalid-feedback">
+                            Must have 8-20 characters, using at least one:
+                            <ul>
+                                <li>uppercase letter</li>
+                                <li>lowercase letter</li>
+                                <li>number</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
                 <div class="row justify-content-center mt-4">
