@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"to-do-app/app/database"
 	"to-do-app/app/models"
+	"to-do-app/app/utils"
 
 	"github.com/alexedwards/argon2id"
 	"github.com/gofiber/fiber/v2"
@@ -43,14 +44,22 @@ func GetUser(c *fiber.Ctx) error {
 
 //creates a new user with the provided username, default password
 func CreateUser(c *fiber.Ctx) error {
-
 	var user models.User
 	var resUser models.UserResponse
-	parseErr := c.BodyParser(&user)
 
-	if parseErr != nil {
+	if parseErr := c.BodyParser(&user); parseErr != nil {
 		log.Println("Unable to create new user.", parseErr)
-		return c.Status(fiber.StatusBadRequest).SendString(parseErr.Error())
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"success": false,
+			"message": parseErr.Error(),
+		})
+	}
+
+	if err := utils.ValidateStruct(user); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"success": false,
+			"message": "Invalid input, cannot parse data.",
+		})
 	}
 
 	hash, hashErr := argon2id.CreateHash(user.Password, argon2id.DefaultParams)
