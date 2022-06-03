@@ -20,7 +20,10 @@ func GetUser(c *fiber.Ctx) error {
 
 	if err != nil {
 		log.Println("Invalid user id.", err)
-		return c.Status(fiber.StatusBadRequest).SendString("Invalid user id.")
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"success": false,
+			"message": "Invalid user id.",
+		})
 	}
 
 	//search for the user with the given id
@@ -28,12 +31,18 @@ func GetUser(c *fiber.Ctx) error {
 
 	if result.Error != nil {
 		log.Println("User not found.", result.Error.Error())
-		return c.Status(fiber.StatusNotFound).SendString(result.Error.Error())
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"success": false,
+			"message": result.Error.Error(),
+		})
 	}
 
 	if err := copier.Copy(&resUser, &user); err != nil {
 		log.Println("Unable to return user. Copying error.", err.Error())
-		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"success": false,
+			"message": err.Error(),
+		})
 	}
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
@@ -55,7 +64,7 @@ func CreateUser(c *fiber.Ctx) error {
 		})
 	}
 
-	if err := utils.ValidateStruct(user); err != nil {
+	if err := utils.ValidateUserPassword(user); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"success": false,
 			"message": "Invalid input, cannot parse data.",
@@ -66,7 +75,10 @@ func CreateUser(c *fiber.Ctx) error {
 
 	if hashErr != nil {
 		log.Println("Unable to create new user.", hashErr)
-		return c.Status(fiber.StatusInternalServerError).SendString(hashErr.Error())
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"success": false,
+			"message": hashErr.Error(),
+		})
 	}
 
 	user.Password = hash
@@ -76,12 +88,18 @@ func CreateUser(c *fiber.Ctx) error {
 
 	if result.Error != nil {
 		log.Println("Unable to add user.", result.Error.Error())
-		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"success": false,
+			"message": result.Error.Error(),
+		})
 	}
 
 	if err := copier.Copy(&resUser, &user); err != nil {
 		log.Println("Unable to add user. Copying error.", err.Error())
-		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"success": false,
+			"message": err.Error(),
+		})
 	}
 
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
@@ -101,13 +119,26 @@ func UpdateUser(c *fiber.Ctx) error {
 
 	if err != nil || parseErr != nil {
 		log.Println("Invalid input.", err)
-		return c.Status(fiber.StatusBadRequest).SendString("Invalid input.")
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"success": false,
+			"message": "Invalid input, cannot parse data.",
+		})
+	}
+
+	if err := utils.ValidateStruct(inputUser); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"success": false,
+			"message": "Invalid input, cannot parse data.",
+		})
 	}
 
 	//search for the user with the given id
 	if res := database.RetrieveUser(&dbUser, uint(id)); res.Error != nil {
 		log.Println("User not found.", res.Error.Error())
-		return c.Status(fiber.StatusNotFound).SendString(res.Error.Error())
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"success": false,
+			"message": res.Error.Error(),
+		})
 	}
 
 	//update any fields that are provided
@@ -118,7 +149,10 @@ func UpdateUser(c *fiber.Ctx) error {
 		hash, hashErr := argon2id.CreateHash(inputUser.Password, argon2id.DefaultParams)
 		if hashErr != nil {
 			log.Println("Unable to update user.", hashErr)
-			return c.Status(fiber.StatusInternalServerError).SendString("Unable to update user.")
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"success": false,
+				"message": "Unable to update user.",
+			})
 		}
 		dbUser.Password = hash
 	}
@@ -126,13 +160,19 @@ func UpdateUser(c *fiber.Ctx) error {
 	//save the changes to the DB
 	if res := database.UpdateUser(&dbUser); res.Error != nil {
 		log.Println("Unable to update user.", res.Error.Error())
-		return c.Status(fiber.StatusInternalServerError).SendString(res.Error.Error())
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"success": false,
+			"message": res.Error.Error(),
+		})
 	}
 
 	//create response object
 	if err := copier.Copy(&resUser, &dbUser); err != nil {
 		log.Println("Unable to update user. Copying error.", err.Error())
-		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"success": false,
+			"message": err.Error(),
+		})
 	}
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
@@ -148,19 +188,24 @@ func RenderAccount(c *fiber.Ctx) error {
 
 	if sessErr != nil {
 		log.Println("Unable to get user info.")
-		return c.Status(fiber.StatusInternalServerError).SendString("Unable to get user info.")
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"success": false,
+			"message": "Unable to get user info.",
+		})
 	}
 
 	result := database.RetrieveUser(&user, currSess.Get("userID").(uint))
 
 	if result.Error != nil {
 		log.Println("Unable to retrieve user.", result.Error.Error())
-		return c.Status(fiber.StatusNotFound).SendString(result.Error.Error())
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"success": false,
+			"message": result.Error.Error(),
+		})
 	}
 
 	return c.Render("account", fiber.Map{
 		"Username": user.Username,
 		"UserID":   user.ID,
 	})
-
 }

@@ -15,6 +15,31 @@ var validate = validator.New()
 
 func ValidateStruct(input models.User) *fiber.Error {
 	var errors []string
+	err := validate.Struct(input)
+
+	if err != nil {
+		//check if the validation itself doesn't work
+		if _, ok := err.(*validator.InvalidValidationError); ok {
+			log.Println(err)
+			errors = append(errors, err.Error())
+		} else {
+			for _, err := range err.(validator.ValidationErrors) {
+				currError := fmt.Sprintf("Field: `%v`, Contraint: `%v`, Contraint Value: `%v`", err.Field(), err.Tag(), err.Param())
+				errors = append(errors, currError)
+				log.Println("Validation Error -", err.Field(), ":", err.Tag(), "->", err.Param())
+			}
+		}
+
+		return &fiber.Error{
+			Code:    fiber.StatusBadRequest,
+			Message: strings.Join(errors, ","),
+		}
+	}
+	return nil
+}
+
+func ValidateUserPassword(input models.User) *fiber.Error {
+	var errors []string
 
 	validate.RegisterStructValidation(UserStructValidation, models.User{})
 
@@ -37,7 +62,6 @@ func ValidateStruct(input models.User) *fiber.Error {
 			Code:    fiber.StatusBadRequest,
 			Message: strings.Join(errors, ","),
 		}
-
 	}
 	return nil
 }
@@ -47,7 +71,7 @@ func UserStructValidation(sl validator.StructLevel) {
 	user := sl.Current().Interface().(models.User)
 
 	//validates that username exists
-	if len(user.Username) == 10 {
+	if len(user.Username) == 0 {
 		sl.ReportError(user.Username, "username", "Username", "must exist", "")
 	}
 
