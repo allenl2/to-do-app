@@ -46,18 +46,16 @@ func main() {
 	//Static files
 	app.Static("/static", "./static")
 
-	//Base
+	//WEBPAGES
 	app.Get("/", func(c *fiber.Ctx) error {
-		return c.Render("index", fiber.Map{
-			"Title": "Hello, World!",
-		})
+		return c.Render("index", fiber.Map{})
 	})
-
-	app.Get("/home", controllers.CheckAuth, controllers.RenderTasks)
-	app.Get("/account", controllers.RenderAccount)
 	app.Get("/register", func(c *fiber.Ctx) error {
 		return c.Render("register", fiber.Map{})
 	})
+
+	app.Get("/home", controllers.CheckAuth, controllers.RenderTasks)
+	app.Get("/account", controllers.CheckAuth, controllers.RenderAccount)
 
 	err := app.Listen(":3000")
 	if err != nil {

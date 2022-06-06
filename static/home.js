@@ -72,9 +72,10 @@ function deleteTask(event) {
     })
     .then(res => {
         if(res.ok) {
-            console.log("task deleted");
+            alert("task deleted");
+            this.parentElement.parentElement.remove();
         } else {
-            console.log("unable to delete task");
+            alert("unable to delete task");
         }
     })
     .catch((err) => {

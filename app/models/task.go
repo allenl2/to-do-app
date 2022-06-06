@@ -7,7 +7,7 @@ import (
 type Task struct {
 	gorm.Model
 	ID       uint
-	TaskName string
+	TaskName string `validate:"omitempty,ascii"`
 	Assignee string
 	IsDone   bool `gorm:"default:false" json:"isDone"`
 	UserID   uint
@@ -15,7 +15,7 @@ type Task struct {
 
 type TaskResponse struct {
 	ID       uint
-	TaskName string
+	TaskName string `validate:"omitempty,ascii"`
 	Assignee string
 	IsDone   bool `gorm:"default:false" json:"isDone"`
 	UserID   uint
