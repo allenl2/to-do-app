@@ -13,7 +13,7 @@ import (
 
 var validate = validator.New()
 
-func ValidateStruct(input models.User) *fiber.Error {
+func ValidateStruct(input interface{}) *fiber.Error {
 	var errors []string
 	err := validate.Struct(input)
 
